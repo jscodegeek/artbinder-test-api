@@ -8,7 +8,6 @@ class CreateArtworks < ActiveRecord::Migration[5.1]
       t.integer :width
       t.integer :height
       t.string :status
-      t.string :images
 
       t.timestamps
     end
