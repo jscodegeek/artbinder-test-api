@@ -14,7 +14,8 @@ class ImageFile < ApplicationRecord
 
        Dir.mkdir("#{IMAGES_FOLDER}/#{name_folder}");
 
-       File.open("#{IMAGES_FOLDER}/#{name_folder}/#{file_name_with_type}", 'wb') do|f|
+       #ORIGIN
+       File.open("#{IMAGES_FOLDER}/#{name_folder}/#{file_name}_origin.#{file_type}", 'wb') do|f|
            f.write(Base64.decode64(base_64_encoded_data))
        end
     end 
