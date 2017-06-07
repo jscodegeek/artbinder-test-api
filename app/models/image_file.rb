@@ -1,22 +1,26 @@
 class ImageFile < ApplicationRecord
-    belongs_to :artworks
+    belongs_to :artwork
+
+    after_create :save_file
 
     IMAGES_FOLDER = "images"
 
-    def self.save_file(params)
-       source_file_name = params[:name] 
-       base_64_encoded_data = params[:base64] 
+    def save_file
+       source_file_name = self.name
+       image_id = self.id
+       artwork = Artwork.find(self.artwork_id)
+       base_64_encoded_data = self.base64
        
        file_type = source_file_name.split('.').last
-       file_name = Time.now.to_i
-       name_folder = file_name
-       file_name_with_type = "#{file_name}.#{file_type}" 
+       
+       dir_name = "#{IMAGES_FOLDER}/#{artwork.id}"
 
-       Dir.mkdir("#{IMAGES_FOLDER}/#{name_folder}");
+       Dir.mkdir(dir_name) unless File.exists?(dir_name)
 
        #ORIGIN
-       File.open("#{IMAGES_FOLDER}/#{name_folder}/#{file_name}_origin.#{file_type}", 'wb') do|f|
+       File.open("#{dir_name}/#{image_id}_origin.#{file_type}", 'wb') do|f|
            f.write(Base64.decode64(base_64_encoded_data))
        end
     end 
 end
+
