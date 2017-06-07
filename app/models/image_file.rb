@@ -3,7 +3,7 @@ class ImageFile < ApplicationRecord
 
     after_create :save_file
 
-    IMAGES_FOLDER = "public"
+    IMAGES_FOLDER = "public/images"
     MAX_ON_LARGEST_SIDE = 800
     SQUARE_SIDE = 300
 
