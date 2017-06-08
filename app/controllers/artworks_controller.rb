@@ -28,11 +28,17 @@ class ArtworksController < ApplicationController
         @artist = Artist.find(artwork_params[:artist_id])
         @artwork = @artist.artworks.create(artwork_params)
         images = params[:images] || []
+        response = @artwork.as_json
+        response[:message] = []
         images.each do |image|
-            @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})
+            begin  
+                @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
+            rescue  
+                response[:message] << "something wrong with #{image[:name]}, file isn't saved"  
+            end 
         end
 
-        render json: @artwork, status: :created
+        render json: response, status: :created
     end
 
     def show
