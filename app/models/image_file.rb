@@ -1,44 +1,21 @@
 class ImageFile < ApplicationRecord
-    belongs_to :artwork
+    belongs_to :artworks
 
-    after_create :save_file
+    IMAGES_FOLDER = "images"
 
-    IMAGES_FOLDER = "public/images"
-    MAX_ON_LARGEST_SIDE = 800
-    SQUARE_SIDE = 300
-
-    def save_file
-       source_file_name = self.name
-       image_id = self.id
-       artwork = Artwork.find(self.artwork_id)
-       base_64_encoded_data = self.base64
+    def self.save_file(params)
+       source_file_name = params[:name] 
+       base_64_encoded_data = params[:base64] 
        
        file_type = source_file_name.split('.').last
-       
-       dir_name = "#{IMAGES_FOLDER}/#{artwork.id}"
+       file_name = Time.now.to_i
+       name_folder = file_name
+       file_name_with_type = "#{file_name}.#{file_type}" 
 
-       Dir.mkdir(dir_name) unless File.exists?(dir_name)
+       Dir.mkdir("#{IMAGES_FOLDER}/#{name_folder}");
 
-       #ORIGIN
-       File.open("#{dir_name}/#{image_id}_origin.#{file_type}", 'wb') do|f|
+       File.open("#{IMAGES_FOLDER}/#{name_folder}/#{file_name_with_type}", 'wb') do|f|
            f.write(Base64.decode64(base_64_encoded_data))
        end
-
-       #MAX_ON_LARGEST_SIDE
-       image = MiniMagick::Image.open("#{dir_name}/#{image_id}_origin.#{file_type}")
-       is_album_orientation = image.width > image.height
-       image.rotate "-90" unless is_album_orientation
-       image.resize MAX_ON_LARGEST_SIDE
-       image.rotate "90" unless is_album_orientation
-       image.format file_type
-       image.write "#{dir_name}/#{image_id}_#{MAX_ON_LARGEST_SIDE}.#{file_type}"
-
-       #SQUARE_SIDE
-       image = MiniMagick::Image.open("#{dir_name}/#{image_id}_origin.#{file_type}")
-       is_album_orientation = image.width > image.height
-       image.resize "#{SQUARE_SIDE}x#{SQUARE_SIDE}"
-       image.format file_type
-       image.write "#{dir_name}/#{image_id}_#{SQUARE_SIDE}x#{SQUARE_SIDE}.#{file_type}"
     end 
 end
-
