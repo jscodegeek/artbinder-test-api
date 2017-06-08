@@ -15,8 +15,8 @@ class ImageFile < ApplicationRecord
         image = MiniMagick::Image.read(Base64.decode64(base_64_encoded_data))
         min = [image.width, image.height].min
         max = [image.width, image.height].max
-
-        raise ArgumentError, "dimension is less then should be provided" unless min >= 800 && max>=12000 
+        
+        raise ArgumentError, "dimension is less then should be provided" unless min >= APP_CONFIG[:max_smallest_side] && max >= APP_CONFIG[:max_biggest_side] 
     end
 
     def save_file
@@ -27,7 +27,7 @@ class ImageFile < ApplicationRecord
        
        file_type = source_file_name.split('.').last
        
-       dir_name = "#{IMAGES_FOLDER}/#{artwork.id}"
+       dir_name = "public/#{APP_CONFIG[:image_folder]}/#{artwork.id}"
 
        Dir.mkdir(dir_name) unless File.exists?(dir_name)
 
@@ -40,16 +40,16 @@ class ImageFile < ApplicationRecord
        image = MiniMagick::Image.open("#{dir_name}/#{image_id}_origin.#{file_type}")
        is_album_orientation = image.width > image.height
        image.rotate "-90" unless is_album_orientation
-       image.resize MAX_ON_LARGEST_SIDE
+       image.resize APP_CONFIG[:max_on_larges_side]
        image.rotate "90" unless is_album_orientation
        image.format file_type
-       image.write "#{dir_name}/#{image_id}_#{MAX_ON_LARGEST_SIDE}.#{file_type}"
+       image.write "#{dir_name}/#{image_id}_#{APP_CONFIG[:max_on_larges_side]}.#{file_type}"
 
        #SQUARE_SIDE
        image = MiniMagick::Image.open("#{dir_name}/#{image_id}_origin.#{file_type}")
-       image.resize "#{SQUARE_SIDE}x#{SQUARE_SIDE}"
+       image.resize "#{APP_CONFIG[:square_side]}x#{APP_CONFIG[:square_side]}"
        image.format file_type
-       image.write "#{dir_name}/#{image_id}_#{SQUARE_SIDE}x#{SQUARE_SIDE}.#{file_type}"
+       image.write "#{dir_name}/#{image_id}_#{APP_CONFIG[:square_side]}x#{APP_CONFIG[:square_side]}.#{file_type}"
     end 
 end
 

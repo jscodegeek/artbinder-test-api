@@ -1,8 +1,6 @@
 class ArtworksController < ApplicationController
     before_action :set_artwork, only: [:show, :update, :destroy]
 
-    IMAGES_FOLDER = "images"
-
     def index
         @artworks = Artwork.all
         app_url = request.base_url
@@ -12,11 +10,11 @@ class ArtworksController < ApplicationController
             aw = aw.as_json
             aw[:images] = []
                 
-            dir_name = "public/#{IMAGES_FOLDER}/#{aw_id}"
+            dir_name = "public/#{APP_CONFIG[:image_folder]}/#{aw_id}"
             if File.exists?(dir_name)
                 files = Dir.entries(dir_name).select {|f| !File.directory? f}
                 files.each do |name|
-                    aw[:images] << "#{app_url}/#{IMAGES_FOLDER}/#{aw_id}/#{name}"
+                    aw[:images] << "#{app_url}/#{APP_CONFIG[:image_folder]}/#{aw_id}/#{name}"
                 end
             end            
             aw
@@ -35,7 +33,7 @@ class ArtworksController < ApplicationController
                 @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
             rescue  
                 response[:message] << "something wrong with #{image[:name]}, file isn't saved"  
-            end 
+            end
         end
 
         render json: response, status: :created
@@ -47,11 +45,11 @@ class ArtworksController < ApplicationController
         aw_id = @artwork.id
         response = @artwork.as_json
         response[:images] = []
-        dir_name = "public/#{IMAGES_FOLDER}/#{aw_id}"
+        dir_name = "public/#{APP_CONFIG[:image_folder]}/#{aw_id}"
         if File.exists?(dir_name)
             files = Dir.entries(dir_name).select {|f| !File.directory? f}
             files.each do |name|
-                response[:images] << "#{app_url}/#{IMAGES_FOLDER}/#{aw_id}/#{name}"
+                response[:images] << "#{app_url}/#{APP_CONFIG[:image_folder]}/#{aw_id}/#{name}"
             end
         end 
 
