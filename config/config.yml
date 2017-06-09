@@ -1,0 +1,20 @@
+production:
+    :image_folder: images
+    :square_side: 300
+    :max_on_larges_side: 800
+    :max_biggest_side: 1200
+    :max_smallest_side: 800
+
+development:
+    :image_folder: images
+    :square_side: 300
+    :max_on_larges_side: 800
+    :max_biggest_side: 1200
+    :max_smallest_side: 800
+
+test:
+    :image_folder: images
+    :square_side: 300
+    :max_on_larges_side: 800
+    :max_biggest_side: 1200
+    :max_smallest_side: 800
