@@ -29,12 +29,11 @@ class ArtworksController < ApplicationController
         response = @artwork.as_json
         response[:message] = []
         images.each do |image|
-            # begin  
-            #     @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
-            # rescue  
-            #     response[:message] << "something wrong with #{image[:name]}, file isn't saved"  
-            # end
-            @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})
+            begin  
+                @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
+            rescue  
+                response[:message] << "something wrong with #{image[:name]}, file isn't saved"  
+            end
         end
 
         render json: response, status: :created
