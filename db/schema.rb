@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170607094256) do
+ActiveRecord::Schema.define(version: 20170607211427) do
 
   create_table "artists", force: :cascade do |t|
     t.string "first_name"
@@ -19,6 +19,28 @@ ActiveRecord::Schema.define(version: 20170607094256) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "artworks", force: :cascade do |t|
+    t.integer "artist_id"
+    t.string "title"
+    t.string "description"
+    t.integer "price"
+    t.integer "width"
+    t.integer "height"
+    t.boolean "is_published"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["artist_id"], name: "index_artworks_on_artist_id"
+  end
+
+  create_table "image_files", force: :cascade do |t|
+    t.integer "artwork_id"
+    t.string "name"
+    t.string "base64"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["artwork_id"], name: "index_image_files_on_artwork_id"
   end
 
 end
