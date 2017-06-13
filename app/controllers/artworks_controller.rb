@@ -43,6 +43,9 @@ class ArtworksController < ApplicationController
         app_url = request.base_url
         
         aw_id = @artwork.id
+
+        puts ImageFile.find_file_paths_by_aw_id(aw_id)
+
         response = @artwork.as_json
         response[:images] = []
         dir_name = "public/#{APP_CONFIG[:image_folder]}/#{aw_id}"
