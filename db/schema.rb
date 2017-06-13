@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 20170607211427) do
     t.integer "price"
     t.integer "width"
     t.integer "height"
-    t.boolean "is_published"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["artist_id"], name: "index_artworks_on_artist_id"

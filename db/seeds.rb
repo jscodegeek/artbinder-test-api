@@ -37,15 +37,25 @@ Artist.find(1).artworks.create({
     :price => 1000,
     :width => 5000,
     :height => 3000,
-    :is_published => 'false'
+    :status => 'PUBLISHED'
 });
 
-# Artist.find(2).create({
-#     :id => 2,
-#     :title => 'Artwork Title 2',
-#     :description => 'Some text',
-#     :price => 4430,
-#     :width => 5430,
-#     :height => 4400,
-#     :is_published => true
-# });
+Artist.find(1).artworks.create({
+    :id => 2,
+    :title => 'Artwork Title 2',
+    :description => 'Some text',
+    :price => 4430,
+    :width => 5430,
+    :height => 4400,
+    :status => 'NOT_PUBLISHED'
+});
+
+Artist.find(2).artworks.create({
+    :id => 3,
+    :title => 'Artwork Title 3',
+    :description => 'Some text 3',
+    :price => 5530,
+    :width => 430,
+    :height => 1000,
+    :status => 'NOT_PUBLISHED'
+});
