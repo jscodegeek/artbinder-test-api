@@ -36,22 +36,6 @@ class ImageFile < ApplicationRecord
         dir_name
     end
 
-    def dir_name
-        artwork_id = Artwork.find(self.artwork_id).id
-        dir_name = "public/#{@@image_folder}/#{artwork_id}"
-    end
-
-    def paths
-        image_id = self.id
-        source_file_name = self.name
-        file_type = source_file_name.split('.').last || 'jpg'
-
-        @original_path = "#{dir_name}/#{image_id}_origin.#{file_type}"
-        @large_path = "#{dir_name}/#{image_id}_large.#{file_type}"
-        @thumb_path = "#{dir_name}/#{image_id}_thumb.#{file_type}"
-        { :original_path => @original_path, :large_path => @large_path, :thumb_path => @thumb_path }
-    end 
-
     def self.find_file_paths_by_aw_id (aw_id)
         images = self.where({ artwork_id: aw_id })
         files_paths = {}
@@ -72,22 +56,43 @@ class ImageFile < ApplicationRecord
 
     def create_large (val)
         image = @image.clone
-        image.rotate "-90" unless landscape?
-        image.resize val
-        image.rotate "90" unless landscape?
+        puts landscape?
+        
+        if landscape?
+            image.rotate "-90"
+            image.resize val
+            image.rotate "90"
+        else
+            image.resize val
+        end
+      
         image.write paths[:large_path]
-        image
     end
 
     def create_thumbnail (val)
         image = @image.clone
         image.resize "#{val}x#{val}"
         image.write paths[:thumb_path]
-        image
     end
 
     def create_origin
         @image.write paths[:original_path]
     end
+
+    def dir_name
+        artwork_id = Artwork.find(self.artwork_id).id
+        dir_name = "public/#{@@image_folder}/#{artwork_id}"
+    end
+
+    def paths
+        image_id = self.id
+        source_file_name = self.name
+        file_type = source_file_name.split('.').last || 'jpg'
+
+        @original_path = "#{dir_name}/#{image_id}_origin.#{file_type}"
+        @large_path = "#{dir_name}/#{image_id}_large.#{file_type}"
+        @thumb_path = "#{dir_name}/#{image_id}_thumb.#{file_type}"
+        { :original_path => @original_path, :large_path => @large_path, :thumb_path => @thumb_path }
+    end 
 end
 
