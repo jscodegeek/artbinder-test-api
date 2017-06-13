@@ -70,7 +70,7 @@ class ArtworksController < ApplicationController
     private
     
     def artwork_params
-        params.permit(:artist_id, :title, :description, :price, :width, :height, :is_published)
+        params.permit(:artist_id, :title, :description, :price, :width, :height, :status)
     end
 
     def set_artwork
