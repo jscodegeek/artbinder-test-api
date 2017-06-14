@@ -7,7 +7,7 @@ class CreateArtworks < ActiveRecord::Migration[5.1]
       t.integer :price
       t.integer :width
       t.integer :height
-      t.boolean :is_published
+      t.string :status
 
       t.timestamps
     end
