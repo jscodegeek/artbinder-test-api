@@ -14,7 +14,7 @@ class ArtworksController < ApplicationController
             begin  
                 @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
             rescue
-                render status: :bad_request  
+                render status: :bad_request and return  
             end
         end
 
