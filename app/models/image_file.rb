@@ -48,6 +48,17 @@ class ImageFile < ApplicationRecord
         files_paths
     end
 
+    def paths
+        image_id = self.id
+        source_file_name = self.name
+        file_type = source_file_name.split('.').last || 'jpg'
+
+        @original_path = "#{dir_name}/#{image_id}_origin.#{file_type}"
+        @large_path = "#{dir_name}/#{image_id}_large.#{file_type}"
+        @thumb_path = "#{dir_name}/#{image_id}_thumb.#{file_type}"
+        { :original_path => @original_path, :large_path => @large_path, :thumb_path => @thumb_path }
+    end
+
     private
 
     def landscape?
@@ -82,17 +93,6 @@ class ImageFile < ApplicationRecord
     def dir_name
         artwork_id = Artwork.find(self.artwork_id).id
         dir_name = "public/#{@@image_folder}/#{artwork_id}"
-    end
-
-    def paths
-        image_id = self.id
-        source_file_name = self.name
-        file_type = source_file_name.split('.').last || 'jpg'
-
-        @original_path = "#{dir_name}/#{image_id}_origin.#{file_type}"
-        @large_path = "#{dir_name}/#{image_id}_large.#{file_type}"
-        @thumb_path = "#{dir_name}/#{image_id}_thumb.#{file_type}"
-        { :original_path => @original_path, :large_path => @large_path, :thumb_path => @thumb_path }
     end 
 end
 
