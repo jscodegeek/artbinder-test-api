@@ -3,52 +3,96 @@ class ImageFile < ApplicationRecord
 
     belongs_to :artwork
 
-    after_create :save_file
-    before_create :check_dimension
+    after_create :process_image
+    before_create :prepare_image
 
-    IMAGES_FOLDER = "public/images"
-    MAX_ON_LARGEST_SIDE = 800
-    SQUARE_SIDE = 300
+    @@image_folder = APP_CONFIG[:image_folder]
+    @@max_on_larges_side = APP_CONFIG[:max_on_larges_side]
+    @@square_side = APP_CONFIG[:square_side]
+    @@max_smallest_side = APP_CONFIG[:max_smallest_side]
+    @@max_biggest_side = APP_CONFIG[:max_biggest_side]
 
-    def check_dimension
-        @base_64_encoded_data = self.base64
-
-        @blob_image = Base64.decode64(@base_64_encoded_data)
-        
-        @image = MiniMagick::Image.read(@blob_image)
+    def prepare_image
+        @image = MiniMagick::Image.read(Base64.decode64(self.base64))
         
         min_size = [@image.width, @image.height].min
         max_size = [@image.width, @image.height].max
 
-        raise ArgumentError, "dimension is less then should be provided" unless min_size >= APP_CONFIG[:max_smallest_side] && max_size >= APP_CONFIG[:max_biggest_side] 
+        raise ArgumentError, "dimension is less then should be provided" unless min_size >= @@max_smallest_side && max_size >= @@max_biggest_side 
     end
 
-    def save_file
-       source_file_name = self.name
-       image_id = self.id
-       artwork = Artwork.find(self.artwork_id)
-       
-       file_type = source_file_name.split('.').last || 'jpg'
-       
-       dir_name = "public/#{APP_CONFIG[:image_folder]}/#{artwork.id}"
+    def process_image
+       create_dir
 
-       Dir.mkdir(dir_name) unless File.exists?(dir_name)
+       create_origin
 
-       #ORIGIN
-       File.open("#{dir_name}/#{image_id}_origin.#{file_type}", 'wb') {|f| f.write(@blob_image)}
+       create_large @@max_on_larges_side
 
-       #MAX_ON_LARGEST_SIDE
-       image = @image.clone
-       is_album_orientation = image.width > image.height
-       image.rotate "-90" unless is_album_orientation
-       image.resize APP_CONFIG[:max_on_larges_side]
-       image.rotate "90" unless is_album_orientation
-       image.write "#{dir_name}/#{image_id}_#{APP_CONFIG[:max_on_larges_side]}.#{file_type}"
+       create_thumbnail @@square_side
+    end
 
-       #SQUARE_SIDE
-       image = @image.clone
-       image.resize "#{APP_CONFIG[:square_side]}x#{APP_CONFIG[:square_side]}"
-       image.write "#{dir_name}/#{image_id}_#{APP_CONFIG[:square_side]}x#{APP_CONFIG[:square_side]}.#{file_type}"
+    def create_dir
+        Dir.mkdir(dir_name) unless File.exists?(dir_name)
+        dir_name
+    end
+
+    def self.find_file_paths_by_aw_id (aw_id)
+        images = self.where({ artwork_id: aw_id })
+        files_paths = {}
+        images.each do |img|
+            files_paths[img.name] = {}
+            img.paths.each do |p|
+                files_paths[img.name][p[0]] = p[1] if File.exists?(p[1])
+            end
+        end
+        files_paths
+    end
+
+    private
+
+    def landscape?
+        @image.width > @image.height
+    end
+
+    def create_large (val)
+        image = @image.clone
+        puts landscape?
+        
+        if landscape?
+            image.rotate "-90"
+            image.resize val
+            image.rotate "90"
+        else
+            image.resize val
+        end
+      
+        image.write paths[:large_path]
+    end
+
+    def create_thumbnail (val)
+        image = @image.clone
+        image.resize "#{val}x#{val}"
+        image.write paths[:thumb_path]
+    end
+
+    def create_origin
+        @image.write paths[:original_path]
+    end
+
+    def dir_name
+        artwork_id = Artwork.find(self.artwork_id).id
+        dir_name = "public/#{@@image_folder}/#{artwork_id}"
+    end
+
+    def paths
+        image_id = self.id
+        source_file_name = self.name
+        file_type = source_file_name.split('.').last || 'jpg'
+
+        @original_path = "#{dir_name}/#{image_id}_origin.#{file_type}"
+        @large_path = "#{dir_name}/#{image_id}_large.#{file_type}"
+        @thumb_path = "#{dir_name}/#{image_id}_thumb.#{file_type}"
+        { :original_path => @original_path, :large_path => @large_path, :thumb_path => @thumb_path }
     end 
 end
 

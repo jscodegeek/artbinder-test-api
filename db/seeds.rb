@@ -5,3 +5,57 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+artists = Artist.create([
+    {
+        :id => 1,
+        :first_name => 'Nadir',
+        :last_name => 'Afonso'
+    },
+    {
+        :id => 2,
+        :first_name => 'Paul',
+        :last_name => 'Cadmus'
+    },
+    {
+        :id => 3,
+        :first_name => 'Josef',
+        :last_name => 'Čapek',
+        :description => 'He was a Czech artist who was best known as a painter, but who was also noted as a writer and a poet. He invented the word robot, which was introduced into literature by his brother, Karel Čapek'
+    },
+    {
+        :id => 4,
+        :first_name => 'Alexander',
+        :last_name => 'Bogomazov'
+    },
+])
+
+Artist.find(1).artworks.create({
+    :id => 1,
+    :title => 'Artwork Title 1',
+    :description => 'Some text',
+    :price => 1000,
+    :width => 5000,
+    :height => 3000,
+    :status => 'PUBLISHED'
+});
+
+Artist.find(1).artworks.create({
+    :id => 2,
+    :title => 'Artwork Title 2',
+    :description => 'Some text',
+    :price => 4430,
+    :width => 5430,
+    :height => 4400,
+    :status => 'NOT_PUBLISHED'
+});
+
+Artist.find(2).artworks.create({
+    :id => 3,
+    :title => 'Artwork Title 3',
+    :description => 'Some text 3',
+    :price => 5530,
+    :width => 430,
+    :height => 1000,
+    :status => 'NOT_PUBLISHED'
+});
