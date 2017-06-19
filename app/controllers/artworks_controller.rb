@@ -9,16 +9,20 @@ class ArtworksController < ApplicationController
     def create
         @artist = Artist.find(artwork_params[:artist_id])
         @artwork = @artist.artworks.create(artwork_params)
-        images = params[:images] || []
-        images.each do |image|
-            begin  
-                @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
-            rescue
-                render status: :bad_request and return  
+        if @artwork.save
+            images = params[:images] || []
+            images.each do |image|
+                begin  
+                    @artwork.image_files.create({:name => image[:name], :base64 => image[:base64]})  
+                rescue
+                    render status: :bad_request and return  
+                end
             end
-        end
 
-        render json: @artwork, status: :created
+            render json: @artwork, status: :created
+        else
+            render json: @artwork.errors, status: :unprocessable_entity
+        end
     end
 
     def show
@@ -26,9 +30,12 @@ class ArtworksController < ApplicationController
     end
 
     def update
-        @artist = Artist.find(artwork_params[:artist_id])
-        @artist.artworks.update(artwork_params)
-        head :no_content
+        @artwork.update(artwork_params)
+        if @artwork.update
+            head :no_conten
+        else
+            render json: @artwork.errors, status: :unprocessable_entity
+        end
     end
 
     def destroy
